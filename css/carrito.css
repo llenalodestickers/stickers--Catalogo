@@ -1,0 +1,133 @@
+.cart {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 360px;
+  height: 100vh;
+  background: var(--blanco);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+  padding: 20px;
+  transition: var(--transicion);
+  z-index: 2000;
+}
+
+.cart.open {
+   right: 0;
+}
+
+.cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cart-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+
+.cart h2 {
+  margin-top: 0;
+}
+
+#cartItems {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ececec;
+  font-size: 14px;
+}
+
+.cart-item-info {
+  display: grid;
+  gap: 3px;
+}
+
+.cart-item-name {
+  font-weight: 600;
+}
+
+.cart-item-meta {
+  color: #666;
+  font-size: 13px;
+}
+
+.btn-remove-item {
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-remove-item:hover {
+  border-color: #c9c9c9;
+  background: #f8f8f8;
+}
+
+.checkout-form {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.checkout-form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.checkout-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
+  outline: none;
+}
+
+.checkout-form input:focus {
+  border-color: #25d366;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.12);
+}
+
+.btn-whatsapp {
+  margin-top: 8px;
+  background: #25d366;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-whatsapp:hover {
+  background: #1ebe5a;
+}
+
+.btn-clear {
+  margin-top: 4px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-clear:hover {
+  background: #f6f6f6;
+}
