@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LlenaloD Stickers</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/carrito.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/footer.css">
+
+
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-top">
+    <h1>LlenaloDstickers</h1>
+    <div class="nav-actions">
+      <button id="openCategorias" class="nav-pill">Categorias</button>
+      <button id="openCart"> Ver Pedido</button>
+    </div>
+  </div>
+  <div id="categoriasNavPanel" class="categorias-nav-panel">
+    <div id="categoriasNav" class="categorias categorias-nav"></div>
+    <div id="subcategoriasNav" class="subcategorias subcategorias-nav"></div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-content">
+      <h1>STICKERS PERSONALIZADOS</h1>
+      <p>Resistentes al agua, al roce y hechos a tu estilo</p>
+
+      <div class="hero-buttons">
+        <a class="btn primary" href="#catalogo">Ver catalogo</a>
+        <a class="btn secondary" href="https://wa.me/541173633880" target="_blank" rel="noopener noreferrer">Pedir por WhatsApp</a>
+      </div>
+    </div>
+
+    <img src="images/logo.png" alt="Stickers LlenaloD" class="hero-sticker">
+  </section>
+
+  <section id="catalogo" class="catalogo-seccion">
+    <h2 id="catalogoTitulo">Catalogo</h2>
+    <div id="categoriasMain" class="categorias"></div>
+    <div id="subcategorias" class="subcategorias"></div>
+    <div class="grid" id="grid-catalogo"></div>
+    <div id="categoriasBottom" class="categorias categorias-bottom"></div>
+  </section>
+
+  <!--  
+<section id="galeria" class="galeria-wrap">
+    <h2>Trabajos realizados</h2>
+    <p>Pedidos reales hechos con amor</p>
+    <div class="galeria">
+      <img src="images/galeria/1.jpg" alt="Trabajo realizado 1">
+      <img src="images/galeria/2.jpg" alt="Trabajo realizado 2">
+      <img src="images/galeria/3.jpg" alt="Trabajo realizado 3">
+      <img src="images/galeria/4.jpg" alt="Trabajo realizado 4">
+    </div>
+    <a href="#catalogo" class="back-to-catalogo" aria-label="Volver al inicio del catalogo">↑ Volver al catalogo</a>
+  </section>-->
+</main>
+
+<div id="overlay" class="cart-overlay" onclick="cerrarCarrito()"></div>
+
+<aside id="cart" class="cart">
+  <button class="cart-btn" onclick="toggleCart()">
+    X <span id="cartCount">0</span>
+  </button>
+
+  <h2>Tu carrito</h2>
+  <div id="cartItems"></div>
+  <p>Total: $<span id="cartTotal">0</span></p>
+
+  <form id="checkoutForm" class="checkout-form">
+    <label for="clienteNombre">Nombre</label>
+    <input id="clienteNombre" name="clienteNombre" type="text" placeholder="Tu nombre" required>
+
+    <label for="clienteWhatsapp">WhatsApp</label>
+    <input id="clienteWhatsapp" name="clienteWhatsapp" type="tel" placeholder="11 1234 5678" required>
+
+    <button type="button" id="clearCartBtn" class="btn-clear">Vaciar carrito</button>
+    <button type="submit" class="btn-whatsapp">Enviar pedido por WhatsApp</button>
+  </form>
+</aside>
+
+
+<script src="js/data.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/catalogo.js"></script>
+<script src="js/carrito.js"></script>
+<script src="js/main.js"></script>
+<script src="js/script.js"></script>
+<footer class="footer">
+  <div class="footer-grid">
+
+    <div>
+      <h3>LlenaloDStickers</h3>
+      <p>
+        Stickers personalizados resistentes al agua.<br>
+        Anime, fútbol, series y más.
+      </p>
+    </div>
+
+    <div>
+      <h3>Contacto</h3>
+      <p>WhatsApp: 11 7363-3880</p>
+      <a href="https://wa.me/541173633880" target="_blank">
+        Hacer pedido
+      </a>
+    </div>
+
+    <div>
+      <h3>Seguinos</h3>
+      <a href="https://instagram.com/llenalodstickers" target="_blank">
+        Instagram
+      </a>
+    </div>
+
+  </div>
+
+  <div class="footer-copy">
+    Año 2026 LlenaloD Stickers· Hecho a mano en Argentina Arg
+  </div>
+</footer>
+
+
+</body>
+</html>
