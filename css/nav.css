@@ -21,6 +21,9 @@
 }
 
 .nav-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #2f2f2f;
   background: #1d1d1d;
   color: #fff;
@@ -51,6 +54,12 @@
   margin: 0 12px;
   text-decoration: none;
   font-weight: 600;
+}
+
+.nav-link {
+  margin: 0;
+  font-size: 0.9rem;
+  text-decoration: none;
 }
 
 #openCart {

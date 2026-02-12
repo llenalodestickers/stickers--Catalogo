@@ -13,6 +13,7 @@ function agregarAlCarrito(idProducto) {
     carrito.push({
       id: producto.id,
       nombre: producto.nombre,
+      imagen: producto.imagen,
       precio: producto.precio,
       cantidad: 1
     });
@@ -35,6 +36,7 @@ function actualizarCarritoUI() {
     .map(
       (item) => `
       <div class="cart-item">
+        <img class="cart-item-thumb" src="${item.imagen}" alt="${item.nombre}">
         <div class="cart-item-info">
           <span class="cart-item-name">${item.nombre}</span>
           <span class="cart-item-meta">${item.cantidad} x $${item.precio}</span>
@@ -67,6 +69,14 @@ function normalizarTelefono(valor) {
   return valor.replace(/\D/g, "");
 }
 
+function obtenerUrlImagenCompartible(pathImagen) {
+  try {
+    return new URL(pathImagen, window.location.href).href;
+  } catch (error) {
+    return pathImagen;
+  }
+}
+
 function construirMensajePedido(nombre, whatsappCliente) {
   const lineas = [
     "Hola, quiero hacer este pedido:",
@@ -75,6 +85,7 @@ function construirMensajePedido(nombre, whatsappCliente) {
 
   carrito.forEach((item) => {
     lineas.push(`- ${item.nombre} x${item.cantidad} ($${item.precio} c/u)`);
+    lineas.push(`  Imagen: ${obtenerUrlImagenCompartible(item.imagen)}`);
   });
 
   const totalPrecio = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
@@ -83,8 +94,202 @@ function construirMensajePedido(nombre, whatsappCliente) {
   lineas.push(`Total: $${totalPrecio}`);
   lineas.push(`Nombre: ${nombre}`);
   lineas.push(`WhatsApp: ${whatsappCliente}`);
+  lineas.push("");
+  lineas.push("Pago por transferencia:");
+  lineas.push("Alias: llenalodestickers");
 
   return lineas.join("\n");
+}
+
+function generarNumeroPedido() {
+  const ahora = new Date();
+  const yy = String(ahora.getFullYear()).slice(-2);
+  const mm = String(ahora.getMonth() + 1).padStart(2, "0");
+  const dd = String(ahora.getDate()).padStart(2, "0");
+  const hh = String(ahora.getHours()).padStart(2, "0");
+  const mi = String(ahora.getMinutes()).padStart(2, "0");
+  const ss = String(ahora.getSeconds()).padStart(2, "0");
+  return `LLD-${yy}${mm}${dd}-${hh}${mi}${ss}`;
+}
+
+function obtenerDatosCliente() {
+  const nombreInput = document.getElementById("clienteNombre");
+  const whatsappInput = document.getElementById("clienteWhatsapp");
+  const nombre = (nombreInput?.value || "").trim();
+  const whatsappCliente = normalizarTelefono((whatsappInput?.value || "").trim());
+  return { nombre, whatsappCliente };
+}
+
+function cargarImagenComoDataURL(src) {
+  return fetch(src)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("No se pudo cargar la imagen");
+      }
+      return response.blob();
+    })
+    .then(
+      (blob) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        })
+    );
+}
+
+function cargarScriptExterno(src) {
+  return new Promise((resolve, reject) => {
+    const existente = document.querySelector(`script[src="${src}"]`);
+    if (existente) {
+      if (window.jspdf?.jsPDF) {
+        resolve();
+        return;
+      }
+      existente.addEventListener("load", () => resolve(), { once: true });
+      existente.addEventListener("error", () => reject(new Error("Error cargando script")), { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.referrerPolicy = "no-referrer";
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Error cargando script"));
+    document.head.appendChild(script);
+  });
+}
+
+async function asegurarJsPdfCargado() {
+  if (window.jspdf?.jsPDF) return true;
+
+  const cdnOpciones = [
+    "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+    "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+  ];
+
+  for (const url of cdnOpciones) {
+    try {
+      await cargarScriptExterno(url);
+      if (window.jspdf?.jsPDF) return true;
+    } catch (error) {
+      // Intenta el siguiente CDN.
+    }
+  }
+
+  return false;
+}
+
+async function descargarPedidoPDF() {
+  if (carrito.length === 0) {
+    alert("Tu carrito esta vacio.");
+    return;
+  }
+
+  const { nombre, whatsappCliente } = obtenerDatosCliente();
+  if (!nombre || !whatsappCliente) {
+    alert("Completa nombre y WhatsApp para descargar el PDF.");
+    return;
+  }
+
+  const libreriaOk = await asegurarJsPdfCargado();
+  const jsPDF = window.jspdf?.jsPDF;
+  if (!libreriaOk || !jsPDF) {
+    alert("No se pudo cargar la libreria PDF. Verifica tu conexion a internet y vuelve a intentar.");
+    return;
+  }
+
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const margenX = 40;
+  let y = 48;
+  const numeroPedido = generarNumeroPedido();
+  const fecha = new Date().toLocaleString("es-AR");
+
+  try {
+    const logoDataUrl = await cargarImagenComoDataURL("images/logo.png");
+    doc.addImage(logoDataUrl, "PNG", margenX, y - 12, 46, 46);
+  } catch (error) {
+    // Si falla el logo, el PDF igualmente se genera.
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.text("LlenaloD Stickers", margenX + 58, y + 10);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.text("Detalle de pedido (tipo factura)", margenX + 58, y + 26);
+  doc.text(`Pedido: ${numeroPedido}`, 555, y + 10, { align: "right" });
+  doc.text(`Fecha: ${fecha}`, 555, y + 26, { align: "right" });
+
+  y += 62;
+  doc.setDrawColor(220, 220, 220);
+  doc.line(margenX, y, 555, y);
+  y += 18;
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Cliente", margenX, y);
+  y += 14;
+  doc.setFont("helvetica", "normal");
+  doc.text(`Nombre: ${nombre}`, margenX, y);
+  y += 14;
+  doc.text(`WhatsApp: ${whatsappCliente}`, margenX, y);
+  y += 20;
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Detalle", margenX, y);
+  y += 16;
+
+  doc.setFontSize(9);
+  doc.text("Producto", margenX, y);
+  doc.text("Cant.", 340, y);
+  doc.text("Unit.", 410, y);
+  doc.text("Subtotal", 555, y, { align: "right" });
+  y += 10;
+  doc.line(margenX, y, 555, y);
+  y += 14;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  let total = 0;
+  carrito.forEach((item) => {
+    const subtotal = item.cantidad * item.precio;
+    total += subtotal;
+
+    const nombreProducto = doc.splitTextToSize(item.nombre, 260);
+    doc.text(nombreProducto, margenX, y);
+    doc.text(String(item.cantidad), 340, y);
+    doc.text(`$${item.precio}`, 410, y);
+    doc.text(`$${subtotal}`, 555, y, { align: "right" });
+
+    const lineasUsadas = Array.isArray(nombreProducto) ? nombreProducto.length : 1;
+    y += Math.max(16, lineasUsadas * 12 + 4);
+  });
+
+  y += 6;
+  doc.line(margenX, y, 555, y);
+  y += 18;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text(`TOTAL: $${total}`, 555, y, { align: "right" });
+
+  y += 24;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  const notaPago = [
+    "Metodo de pago:",
+    "Transferencia bancaria.",
+    "Alias para transferir: llenalodestickers"
+  ];
+  doc.text(notaPago, margenX, y);
+
+  y += 48;
+  doc.setTextColor(95, 95, 95);
+  doc.setFontSize(9);
+  doc.text("Gracias por tu compra. Este comprobante resume el pedido enviado.", margenX, y);
+
+  doc.save(`pedido-${numeroPedido}.pdf`);
 }
 
 function enviarPedidoWhatsApp(event) {
@@ -114,6 +319,7 @@ function enviarPedidoWhatsApp(event) {
 document.addEventListener("DOMContentLoaded", () => {
   const checkoutForm = document.getElementById("checkoutForm");
   const clearCartBtn = document.getElementById("clearCartBtn");
+  const downloadPdfBtn = document.getElementById("downloadPdfBtn");
 
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", enviarPedidoWhatsApp);
@@ -121,5 +327,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (clearCartBtn) {
     clearCartBtn.addEventListener("click", vaciarCarrito);
+  }
+
+  if (downloadPdfBtn) {
+    downloadPdfBtn.addEventListener("click", descargarPedidoPDF);
   }
 });
