@@ -156,7 +156,7 @@
 .btn-pdf {
   margin-top: 4px;
   border: 1px solid #cfcfcf;
-  background: #fff;
+  background: #ffc800;
   border-radius: 10px;
   padding: 10px;
   font-weight: 700;
@@ -169,8 +169,8 @@
 
 .toast-agregar {
   position: fixed;
-  right: 16px;
-  bottom: 16px;
+  right: 376px;
+  top: 96px;
   width: min(360px, calc(100vw - 24px));
   background: #fff;
   border: 1px solid #e8e8e8;
@@ -183,15 +183,28 @@
   align-items: center;
   z-index: 2200;
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(-10px) translateX(8px);
   pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .toast-agregar.show {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) translateX(0);
   pointer-events: auto;
+}
+
+.toast-agregar::after {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 26px;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-right: 1px solid #e8e8e8;
+  border-top: 1px solid #e8e8e8;
+  transform: rotate(45deg);
 }
 
 .toast-agregar-thumb {
@@ -258,4 +271,15 @@
   font-size: 14px;
   font-weight: 700;
   color: #141414;
+}
+
+@media (max-width: 900px) {
+  .toast-agregar {
+    right: 12px;
+    top: 86px;
+  }
+
+  .toast-agregar::after {
+    display: none;
+  }
 }
