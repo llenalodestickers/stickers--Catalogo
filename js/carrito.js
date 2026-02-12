@@ -1,5 +1,8 @@
 let carrito = [];
 const WHATSAPP_NEGOCIO = "541173633880";
+let toastAgregar = null;
+let toastTimer = null;
+let toastProductoActivo = null;
 
 function agregarAlCarrito(idProducto) {
   const producto = productos.find((p) => p.id === idProducto);
@@ -20,6 +23,7 @@ function agregarAlCarrito(idProducto) {
   }
 
   actualizarCarritoUI();
+  mostrarToastAgregar(producto.id);
 }
 
 function actualizarCarritoUI() {
@@ -48,6 +52,10 @@ function actualizarCarritoUI() {
     .join("");
 
   cartTotal.textContent = totalPrecio;
+
+  if (toastProductoActivo) {
+    actualizarCantidadToast(toastProductoActivo);
+  }
 }
 
 function quitarDelCarrito(idProducto) {
@@ -58,11 +66,131 @@ function quitarDelCarrito(idProducto) {
 function vaciarCarrito() {
   carrito = [];
   actualizarCarritoUI();
+  ocultarToastAgregar();
 }
 
 function cerrarCarrito() {
   document.getElementById("cart").classList.remove("open");
   document.getElementById("overlay").classList.remove("show");
+}
+
+function obtenerItemCarrito(idProducto) {
+  return carrito.find((item) => item.id === idProducto);
+}
+
+function cambiarCantidadItem(idProducto, delta) {
+  const item = obtenerItemCarrito(idProducto);
+  if (!item) return;
+
+  item.cantidad += delta;
+  if (item.cantidad <= 0) {
+    carrito = carrito.filter((carritoItem) => carritoItem.id !== idProducto);
+  }
+
+  actualizarCarritoUI();
+}
+
+function construirToastAgregar() {
+  if (toastAgregar) return toastAgregar;
+
+  const toast = document.createElement("div");
+  toast.id = "toastAgregar";
+  toast.className = "toast-agregar";
+  toast.innerHTML = `
+    <img class="toast-agregar-thumb" src="" alt="">
+    <div class="toast-agregar-info">
+      <span class="toast-agregar-label">Agregado al pedido</span>
+      <span class="toast-agregar-nombre"></span>
+      <span class="toast-agregar-precio"></span>
+    </div>
+    <div class="toast-agregar-cantidad">
+      <button type="button" class="toast-agregar-btn" data-action="restar" aria-label="Quitar uno">-</button>
+      <span class="toast-agregar-numero">1</span>
+      <button type="button" class="toast-agregar-btn" data-action="sumar" aria-label="Agregar uno">+</button>
+    </div>
+  `;
+
+  toast.addEventListener("click", (event) => {
+    const boton = event.target.closest(".toast-agregar-btn");
+    if (!boton || !toastProductoActivo) return;
+
+    if (boton.dataset.action === "sumar") {
+      cambiarCantidadItem(toastProductoActivo, 1);
+      programarCierreToast();
+      return;
+    }
+
+    cambiarCantidadItem(toastProductoActivo, -1);
+    const itemActual = obtenerItemCarrito(toastProductoActivo);
+    if (!itemActual) {
+      ocultarToastAgregar();
+      return;
+    }
+    programarCierreToast();
+  });
+
+  document.body.appendChild(toast);
+  toastAgregar = toast;
+  return toastAgregar;
+}
+
+function actualizarCantidadToast(idProducto) {
+  if (!toastAgregar || toastProductoActivo !== idProducto) return;
+  const item = obtenerItemCarrito(idProducto);
+  if (!item) {
+    ocultarToastAgregar();
+    return;
+  }
+  const cantidadEl = toastAgregar.querySelector(".toast-agregar-numero");
+  if (cantidadEl) {
+    cantidadEl.textContent = item.cantidad;
+  }
+}
+
+function programarCierreToast() {
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    ocultarToastAgregar();
+  }, 4500);
+}
+
+function ocultarToastAgregar() {
+  clearTimeout(toastTimer);
+  toastTimer = null;
+  toastProductoActivo = null;
+  if (toastAgregar) {
+    toastAgregar.classList.remove("show");
+  }
+}
+
+function mostrarToastAgregar(idProducto) {
+  const item = obtenerItemCarrito(idProducto);
+  if (!item) return;
+
+  const toast = construirToastAgregar();
+  toastProductoActivo = idProducto;
+
+  const thumb = toast.querySelector(".toast-agregar-thumb");
+  const nombre = toast.querySelector(".toast-agregar-nombre");
+  const precio = toast.querySelector(".toast-agregar-precio");
+  const cantidad = toast.querySelector(".toast-agregar-numero");
+
+  if (thumb) {
+    thumb.src = item.imagen;
+    thumb.alt = item.nombre;
+  }
+  if (nombre) {
+    nombre.textContent = item.nombre;
+  }
+  if (precio) {
+    precio.textContent = `$${item.precio} c/u`;
+  }
+  if (cantidad) {
+    cantidad.textContent = item.cantidad;
+  }
+
+  toast.classList.add("show");
+  programarCierreToast();
 }
 
 function normalizarTelefono(valor) {
@@ -320,6 +448,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const checkoutForm = document.getElementById("checkoutForm");
   const clearCartBtn = document.getElementById("clearCartBtn");
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+  construirToastAgregar();
 
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", enviarPedidoWhatsApp);
