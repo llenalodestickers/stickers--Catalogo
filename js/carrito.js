@@ -205,7 +205,7 @@ function obtenerUrlImagenCompartible(pathImagen) {
   }
 }
 
-function construirMensajePedido(nombre, whatsappCliente) {
+function construirMensajePedido(nombre, whatsappCliente, numeroPedido) {
   const lineas = [
     "Hola, quiero hacer este pedido:",
     ""
@@ -219,6 +219,9 @@ function construirMensajePedido(nombre, whatsappCliente) {
   const totalPrecio = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
 
   lineas.push("");
+  if (numeroPedido) {
+    lineas.push(`Pedido: ${numeroPedido}`);
+  }
   lineas.push(`Total: $${totalPrecio}`);
   lineas.push(`Nombre: ${nombre}`);
   lineas.push(`WhatsApp: ${whatsappCliente}`);
@@ -420,7 +423,7 @@ async function descargarPedidoPDF() {
   doc.save(`pedido-${numeroPedido}.pdf`);
 }
 
-function enviarPedidoWhatsApp(event) {
+async function enviarPedidoWhatsApp(event) {
   event.preventDefault();
 
   if (carrito.length === 0) {
@@ -438,7 +441,22 @@ function enviarPedidoWhatsApp(event) {
     return;
   }
 
-  const mensaje = construirMensajePedido(nombre, whatsappCliente);
+  const numeroPedido = generarNumeroPedido();
+  if (window.backendPedidos?.guardarPedidoCompletoEnNube) {
+    const guardado = await window.backendPedidos.guardarPedidoCompletoEnNube({
+      nombre,
+      whatsappCliente,
+      carrito,
+      numeroPedido
+    });
+
+    if (!guardado.ok && guardado.reason !== "not_configured") {
+      console.error("No se pudo guardar el pedido en la base de datos.", guardado.error);
+      alert("No se pudo guardar el pedido en la base. Se abrira WhatsApp igual.");
+    }
+  }
+
+  const mensaje = construirMensajePedido(nombre, whatsappCliente, numeroPedido);
   const url = `https://wa.me/${WHATSAPP_NEGOCIO}?text=${encodeURIComponent(mensaje)}`;
 
   window.open(url, "_blank");

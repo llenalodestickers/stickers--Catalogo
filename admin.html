@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | LlenaloD Stickers</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/footer.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-top">
+      <h1>LlenaloDstickers</h1>
+      <div class="nav-actions">
+        <a class="nav-pill nav-link" href="index.html">Catalogo</a>
+        <span class="nav-pill admin-pill">Panel Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-wrap">
+    <header class="admin-header">
+      <h1>Panel de Pedidos</h1>
+      <p>Listado de pedidos y datos de clientes.</p>
+      <div class="admin-actions">
+        <button id="refreshBtn" type="button">Actualizar</button>
+        <a class="admin-link" href="index.html">Volver al catalogo</a>
+      </div>
+    </header>
+
+    <section class="admin-kpis">
+      <article class="kpi">
+        <span>Total pedidos</span>
+        <strong id="kpiPedidos">0</strong>
+      </article>
+      <article class="kpi">
+        <span>Total facturado</span>
+        <strong id="kpiTotal">$0</strong>
+      </article>
+    </section>
+
+    <section id="configPanel" class="admin-config">
+      <h2>Configurar Supabase</h2>
+      <p>Pega la URL del proyecto y la anon key para habilitar el panel.</p>
+      <form id="configForm" class="admin-config-form">
+        <label for="supabaseUrlInput">Project URL</label>
+        <input id="supabaseUrlInput" type="text" placeholder="https://tu-proyecto.supabase.co" required>
+        <label for="supabaseAnonKeyInput">Anon key</label>
+        <textarea id="supabaseAnonKeyInput" rows="3" placeholder="eyJ..." required></textarea>
+        <button type="submit">Guardar configuracion</button>
+      </form>
+    </section>
+
+    <section class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Nro</th>
+            <th>Cliente</th>
+            <th>WhatsApp</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="pedidosBody">
+          <tr>
+            <td colspan="7">Cargando...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="js/supabase-config.js"></script>
+  <script src="js/backend.js"></script>
+  <script src="js/admin.js"></script>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <h3>LlenaloDStickers</h3>
+        <p>Gestion de pedidos y clientes desde el panel admin.</p>
+      </div>
+      <div>
+        <h3>Accesos</h3>
+        <a href="index.html">Ir al catalogo</a>
+      </div>
+      <div>
+        <h3>Contacto</h3>
+        <p>WhatsApp: 11 7363-3880</p>
+      </div>
+    </div>
+    <div class="footer-copy">
+      Año 2026 LlenaloDstickers
+    </div>
+  </footer>
+</body>
+</html>
