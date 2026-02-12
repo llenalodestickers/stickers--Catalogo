@@ -2,31 +2,19 @@
 
 Catalogo estatico para GitHub Pages con carrito y envio de pedido por WhatsApp.
 
-## Admin + Base de Datos (Supabase)
+## Admin local (sin Supabase)
 
-Se agrego una integracion opcional para guardar:
-- clientes
-- pedidos
-- items de cada pedido
+El panel `admin.html` ahora usa almacenamiento local del navegador (`localStorage`).
 
-### Archivos nuevos
-- `js/supabase-config.js`: URL y anon key del proyecto Supabase.
-- `js/backend.js`: funciones para guardar cliente/pedido/items.
-- `admin.html`: panel admin para listar pedidos y actualizar estado.
-- `js/admin.js`: logica del panel admin.
-- `css/admin.css`: estilos del panel admin.
-- `supabase/schema.sql`: script SQL de tablas y politicas.
+- Al enviar un pedido desde `index.html`, se guarda en local.
+- `admin.html` muestra esos pedidos y permite cambiar el estado.
+- `admin.html` incluye una caja local:
+  - suma automaticamente ventas del catalogo como ingresos
+  - permite cargar movimientos manuales (ferias, personalizados, otros)
+  - calcula ingresos, egresos y balance
 
-### Configuracion
-1. Crear proyecto en Supabase.
-2. Ejecutar `supabase/schema.sql` en SQL Editor.
-3. Completar `js/supabase-config.js`:
-   - `url`
-   - `anonKey` (publica, no service role)
-4. Publicar en GitHub Pages.
+## Importante
 
-### Uso
-- Sitio principal: `index.html`
-- Panel admin: `admin.html`
-
-Si `js/supabase-config.js` queda vacio, la web sigue funcionando y solo envia por WhatsApp (sin guardar en base).
+- Los datos quedan guardados solo en el navegador/dispositivo actual.
+- Si abris la web en otro navegador, no vas a ver esos pedidos.
+- Si borras datos del navegador, se pierden los pedidos guardados localmente.

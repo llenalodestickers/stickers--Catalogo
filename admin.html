@@ -41,16 +41,78 @@
       </article>
     </section>
 
-    <section id="configPanel" class="admin-config">
-      <h2>Configurar Supabase</h2>
-      <p>Pega la URL del proyecto y la anon key para habilitar el panel.</p>
-      <form id="configForm" class="admin-config-form">
-        <label for="supabaseUrlInput">Project URL</label>
-        <input id="supabaseUrlInput" type="text" placeholder="https://tu-proyecto.supabase.co" required>
-        <label for="supabaseAnonKeyInput">Anon key</label>
-        <textarea id="supabaseAnonKeyInput" rows="3" placeholder="eyJ..." required></textarea>
-        <button type="submit">Guardar configuracion</button>
+    <section class="admin-finanzas">
+      <header class="admin-finanzas-header">
+        <h2>Caja Local</h2>
+        <p>Resumen de ingresos y egresos. Incluye ventas del catalogo y movimientos manuales (ferias, personalizados, otros).</p>
+      </header>
+
+      <section class="admin-kpis admin-kpis-finanzas">
+        <article class="kpi">
+          <span>Ingresos</span>
+          <strong id="kpiIngresos">$0</strong>
+        </article>
+        <article class="kpi">
+          <span>Egresos</span>
+          <strong id="kpiEgresos">$0</strong>
+        </article>
+        <article class="kpi">
+          <span>Balance</span>
+          <strong id="kpiBalance">$0</strong>
+        </article>
+      </section>
+
+      <form id="movimientoForm" class="movimiento-form">
+        <label>
+          Tipo
+          <select id="movTipo" required>
+            <option value="ingreso">Ingreso</option>
+            <option value="egreso">Egreso</option>
+          </select>
+        </label>
+        <label>
+          Origen
+          <select id="movOrigen" required>
+            <option value="feria">Feria</option>
+            <option value="personalizado">Personalizado</option>
+            <option value="otro">Otro</option>
+          </select>
+        </label>
+        <label>
+          Monto
+          <input id="movMonto" type="number" min="1" step="1" placeholder="0" required>
+        </label>
+        <label class="movimiento-descripcion">
+          Descripcion
+          <input id="movDescripcion" type="text" maxlength="120" placeholder="Ej: Venta en feria Plaza - puesto 12" required>
+        </label>
+        <label>
+          Fecha
+          <input id="movFecha" type="datetime-local" required>
+        </label>
+        <button type="submit">Agregar movimiento</button>
       </form>
+
+      <section class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Origen</th>
+              <th>Descripcion</th>
+              <th>Monto</th>
+              <th>Fuente</th>
+              <th>Accion</th>
+            </tr>
+          </thead>
+          <tbody id="cajaBody">
+            <tr>
+              <td colspan="7">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
     </section>
 
     <section class="admin-table-wrap">
@@ -75,7 +137,6 @@
     </section>
   </main>
 
-  <script src="js/supabase-config.js"></script>
   <script src="js/backend.js"></script>
   <script src="js/admin.js"></script>
 

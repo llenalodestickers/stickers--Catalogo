@@ -452,7 +452,8 @@ async function enviarPedidoWhatsApp(event) {
 
     if (!guardado.ok && guardado.reason !== "not_configured") {
       console.error("No se pudo guardar el pedido en la base de datos.", guardado.error);
-      alert("No se pudo guardar el pedido en la base. Se abrira WhatsApp igual.");
+      const detalle = guardado?.error?.message ? `\nDetalle: ${guardado.error.message}` : "";
+      alert(`No se pudo guardar el pedido en la base. Se abrira WhatsApp igual.${detalle}`);
     }
   }
 

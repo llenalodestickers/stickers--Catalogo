@@ -42,51 +42,8 @@
 .admin-kpis {
   margin: 20px 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(140px, 220px));
+  grid-template-columns: repeat(2, minmax(140px, 240px));
   gap: 12px;
-}
-
-.admin-config {
-  margin: 18px 0 20px;
-  background: #fff;
-  border: 1px solid #d8d8d8;
-  border-radius: 14px;
-  padding: 14px;
-}
-
-.admin-config h2 {
-  margin: 0 0 6px;
-  font-size: 1.1rem;
-}
-
-.admin-config p {
-  margin: 0 0 10px;
-  opacity: 0.8;
-}
-
-.admin-config-form {
-  display: grid;
-  gap: 8px;
-}
-
-.admin-config-form input,
-.admin-config-form textarea {
-  width: 100%;
-  border: 1px solid #cfcfcf;
-  border-radius: 8px;
-  padding: 8px 10px;
-  font: inherit;
-}
-
-.admin-config-form button {
-  justify-self: start;
-  border: 1px solid #e3b200;
-  border-radius: 999px;
-  padding: 9px 14px;
-  background: linear-gradient(135deg, #ffc800, #ffdf5a);
-  color: #151515;
-  font-weight: 800;
-  cursor: pointer;
 }
 
 .kpi {
@@ -107,6 +64,66 @@
 
 .kpi strong {
   font-size: 1.35rem;
+}
+
+.admin-finanzas {
+  margin: 6px 0 22px;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.admin-finanzas-header h2 {
+  margin: 0 0 6px;
+}
+
+.admin-finanzas-header p {
+  margin: 0;
+  opacity: 0.75;
+}
+
+.admin-kpis-finanzas {
+  grid-template-columns: repeat(3, minmax(150px, 220px));
+}
+
+.movimiento-form {
+  margin: 12px 0 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.movimiento-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.movimiento-form input,
+.movimiento-form select {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+  background: #fff;
+}
+
+.movimiento-form button {
+  border: 1px solid #e3b200;
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: linear-gradient(135deg, #ffc800, #ffdf5a);
+  color: #151515;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.movimiento-descripcion {
+  grid-column: span 2;
 }
 
 .admin-table-wrap {
@@ -149,6 +166,25 @@
   opacity: 0.65;
 }
 
+.monto-ingreso {
+  color: #0a8a2a;
+  font-weight: 700;
+}
+
+.monto-egreso {
+  color: #b02121;
+  font-weight: 700;
+}
+
+.btn-eliminar-mov {
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 0.82rem;
+  background: #fff;
+  cursor: pointer;
+}
+
 .admin-pill {
   background: #252525;
   border-color: #383838;
@@ -161,5 +197,13 @@
 
   .admin-kpis {
     grid-template-columns: 1fr;
+  }
+
+  .movimiento-form {
+    grid-template-columns: 1fr;
+  }
+
+  .movimiento-descripcion {
+    grid-column: auto;
   }
 }

@@ -18,50 +18,18 @@ function safeText(value) {
   });
 }
 
-function setConfigPanelState(isConfigured) {
-  const panel = document.getElementById("configPanel");
-  if (!panel) return;
-  panel.style.display = isConfigured ? "none" : "block";
-}
-
-function cargarConfigEnFormulario() {
-  const urlInput = document.getElementById("supabaseUrlInput");
-  const keyInput = document.getElementById("supabaseAnonKeyInput");
-  if (!urlInput || !keyInput) return;
-
-  const cfg = window.backendPedidos.getSupabaseConfig();
-  urlInput.value = cfg.url || "";
-  keyInput.value = cfg.anonKey || "";
-}
-
-function inicializarFormularioConfig() {
-  const form = document.getElementById("configForm");
-  if (!form) return;
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const urlInput = document.getElementById("supabaseUrlInput");
-    const keyInput = document.getElementById("supabaseAnonKeyInput");
-    const url = (urlInput?.value || "").trim().replace(/\/+$/, "");
-    const anonKey = (keyInput?.value || "").trim();
-
-    if (!url || !anonKey) {
-      alert("Completa URL y anon key.");
-      return;
-    }
-
-    localStorage.setItem("supabase_url", url);
-    localStorage.setItem("supabase_anon_key", anonKey);
-    setConfigPanelState(true);
-    await cargarPedidos();
-  });
+function toDateTimeLocalValue(date) {
+  const d = date instanceof Date ? date : new Date(date);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
 }
 
 async function actualizarEstadoPedido(idPedido, estado) {
-  await window.backendPedidos.supabaseRequest(`pedidos?id=eq.${idPedido}`, {
-    method: "PATCH",
-    body: JSON.stringify({ estado })
-  });
+  await window.backendPedidos.actualizarEstadoPedido(idPedido, estado);
 }
 
 function renderPedidos(pedidos) {
@@ -120,39 +88,173 @@ function renderPedidos(pedidos) {
   });
 }
 
-async function cargarPedidos() {
-  const body = document.getElementById("pedidosBody");
-  if (body) {
-    body.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
-  }
+function construirMovimientosCatalogo(pedidos) {
+  return pedidos.map((pedido) => {
+    const cliente = pedido?.cliente?.nombre ? ` - ${pedido.cliente.nombre}` : "";
+    return {
+      id: `catalogo-${pedido.id}`,
+      fecha: pedido.created_at,
+      tipo: "ingreso",
+      origen: "catalogo",
+      descripcion: `Venta ${pedido.numero || ""}${cliente}`.trim(),
+      monto: Number(pedido.total || 0),
+      fuente: "catalogo",
+      editable: false
+    };
+  });
+}
 
-  const cfg = window.backendPedidos.getSupabaseConfig();
-  setConfigPanelState(cfg.enabled);
-  if (!cfg.enabled) {
-    if (body) {
-      body.innerHTML =
-        '<tr><td colspan="7">Configura Supabase en este panel para usar admin.</td></tr>';
-    }
+function normalizarMovimientosManuales(movimientos) {
+  return movimientos.map((mov) => ({
+    id: mov.id,
+    fecha: mov.fecha || mov.created_at,
+    tipo: mov.tipo === "egreso" ? "egreso" : "ingreso",
+    origen: mov.origen || "otro",
+    descripcion: mov.descripcion || "Movimiento manual",
+    monto: Number(mov.monto || 0),
+    fuente: "manual",
+    editable: true
+  }));
+}
+
+function renderCaja(movimientosCombinados) {
+  const body = document.getElementById("cajaBody");
+  const kpiIngresos = document.getElementById("kpiIngresos");
+  const kpiEgresos = document.getElementById("kpiEgresos");
+  const kpiBalance = document.getElementById("kpiBalance");
+  if (!body || !kpiIngresos || !kpiEgresos || !kpiBalance) return;
+
+  const ingresos = movimientosCombinados
+    .filter((m) => m.tipo === "ingreso")
+    .reduce((acc, m) => acc + Number(m.monto || 0), 0);
+  const egresos = movimientosCombinados
+    .filter((m) => m.tipo === "egreso")
+    .reduce((acc, m) => acc + Number(m.monto || 0), 0);
+  const balance = ingresos - egresos;
+
+  kpiIngresos.textContent = moneyAR(ingresos);
+  kpiEgresos.textContent = moneyAR(egresos);
+  kpiBalance.textContent = moneyAR(balance);
+
+  if (!movimientosCombinados.length) {
+    body.innerHTML = '<tr><td colspan="7" class="muted">No hay movimientos.</td></tr>';
     return;
   }
 
+  const ordenados = [...movimientosCombinados].sort(
+    (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+  );
+
+  body.innerHTML = ordenados
+    .map((mov) => {
+      const claseMonto = mov.tipo === "egreso" ? "monto-egreso" : "monto-ingreso";
+      const signo = mov.tipo === "egreso" ? "-" : "+";
+      const accion = mov.editable
+        ? `<button type="button" class="btn-eliminar-mov" data-id="${safeText(mov.id)}">Eliminar</button>`
+        : '<span class="muted">Auto</span>';
+
+      return `
+        <tr>
+          <td>${safeText(fechaAR(mov.fecha))}</td>
+          <td>${safeText(mov.tipo)}</td>
+          <td>${safeText(mov.origen)}</td>
+          <td>${safeText(mov.descripcion)}</td>
+          <td class="${claseMonto}">${signo}${safeText(moneyAR(mov.monto))}</td>
+          <td>${safeText(mov.fuente)}</td>
+          <td>${accion}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  body.querySelectorAll(".btn-eliminar-mov").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Eliminar este movimiento manual?")) return;
+      try {
+        await window.backendPedidos.eliminarMovimientoFinanciero(btn.dataset.id);
+        await cargarAdmin();
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo eliminar el movimiento.");
+      }
+    });
+  });
+}
+
+function inicializarFormularioMovimientos() {
+  const form = document.getElementById("movimientoForm");
+  const fechaInput = document.getElementById("movFecha");
+  if (!form || !fechaInput) return;
+
+  fechaInput.value = toDateTimeLocalValue(new Date());
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const tipo = document.getElementById("movTipo")?.value || "ingreso";
+    const origen = document.getElementById("movOrigen")?.value || "otro";
+    const monto = Number(document.getElementById("movMonto")?.value || 0);
+    const descripcion = (document.getElementById("movDescripcion")?.value || "").trim();
+    const fecha = document.getElementById("movFecha")?.value;
+
+    if (!(monto > 0)) {
+      alert("El monto debe ser mayor a 0.");
+      return;
+    }
+    if (!descripcion) {
+      alert("Completa una descripcion.");
+      return;
+    }
+
+    try {
+      await window.backendPedidos.guardarMovimientoFinanciero({
+        tipo,
+        origen,
+        monto,
+        descripcion,
+        fecha: fecha ? new Date(fecha).toISOString() : new Date().toISOString()
+      });
+      form.reset();
+      fechaInput.value = toDateTimeLocalValue(new Date());
+      await cargarAdmin();
+    } catch (error) {
+      console.error(error);
+      alert("No se pudo guardar el movimiento.");
+    }
+  });
+}
+
+async function cargarAdmin() {
+  const pedidosBody = document.getElementById("pedidosBody");
+  const cajaBody = document.getElementById("cajaBody");
+
+  if (pedidosBody) pedidosBody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+  if (cajaBody) cajaBody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+
   try {
-    const query =
-      "pedidos?select=id,numero,total,estado,created_at,cliente:clientes(nombre,whatsapp),items:pedido_items(id)&order=created_at.desc";
-    const pedidos = await window.backendPedidos.supabaseRequest(query);
-    renderPedidos(Array.isArray(pedidos) ? pedidos : []);
+    const [pedidos, movimientosManuales] = await Promise.all([
+      window.backendPedidos.listarPedidos(),
+      window.backendPedidos.listarMovimientosFinancieros()
+    ]);
+
+    const pedidosLista = Array.isArray(pedidos) ? pedidos : [];
+    const manualLista = Array.isArray(movimientosManuales) ? movimientosManuales : [];
+
+    renderPedidos(pedidosLista);
+
+    const autoCatalogo = construirMovimientosCatalogo(pedidosLista);
+    const manualNormalizados = normalizarMovimientosManuales(manualLista);
+    renderCaja([...autoCatalogo, ...manualNormalizados]);
   } catch (error) {
     console.error(error);
-    if (body) {
-      body.innerHTML = '<tr><td colspan="7">Error al cargar pedidos.</td></tr>';
-    }
+    if (pedidosBody) pedidosBody.innerHTML = '<tr><td colspan="7">Error al cargar pedidos.</td></tr>';
+    if (cajaBody) cajaBody.innerHTML = '<tr><td colspan="7">Error al cargar movimientos.</td></tr>';
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const refreshBtn = document.getElementById("refreshBtn");
-  refreshBtn?.addEventListener("click", cargarPedidos);
-  cargarConfigEnFormulario();
-  inicializarFormularioConfig();
-  cargarPedidos();
+  refreshBtn?.addEventListener("click", cargarAdmin);
+  inicializarFormularioMovimientos();
+  cargarAdmin();
 });
