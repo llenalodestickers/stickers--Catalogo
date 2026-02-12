@@ -1,0 +1,26 @@
+# Normalize line endings automatically for text files
+* text=auto
+
+# Web source files should use LF
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+*.sql  text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+
+# Windows scripts should keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.gif  binary
+*.ico  binary
+*.svg  text eol=lf
+*.pdf  binary
+*.zip  binary
