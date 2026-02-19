@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LlenaloD Stickers</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/base.css">
+ <!--<link rel="stylesheet" href="css/nav.css">--> 
+<link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/carrito.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/footer.css">
+ <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#e3b200",
+            "primary-dark": "#b29900",
+            "background-light": "#f8f6f5",
+            "background-dark": "#1a1a1a",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+ <style>
+    body { font-family: "Plus Jakarta Sans", sans-serif; }
+    .reveal-on-scroll { opacity: 0; transform: translateY(20px); transition: all .7s ease; }
+    .reveal-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+    .soft-pulse { animation: softPulse 2.4s ease-in-out infinite; }
+    @keyframes softPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(227,178,0,.35); }
+      50% { box-shadow: 0 0 0 10px rgba(227,178,0,0); }
+    }
+  </style>
+
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#181311] dark:text-white antialiased">
+<header class="sticky top-0 z-50 border-b border-primary/10 bg-white/90 dark:bg-background-dark/90 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/30">
+          <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+        </div>
+        <h1 class="text-xl font-extrabold">LlenaloD<span class="text-primary">Stickers</span></h1>
+      </a>
+      <nav class="hidden md:flex items-center gap-3 p-1 rounded-full border border-primary/20 bg-white/70 dark:bg-background-dark/60 shadow-lg shadow-primary/10">
+        <a href="index.html" class="px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary hover:text-white transition-all">Inicio</a>
+        <a href="./" class="px-4 py-2 rounded-full text-sm font-semibold bg-primary text-white">Catalogo</a>
+        <div class="nav-actions">
+          <button id="openCart" class="px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary hover:text-white transition-all">Ver Pedido</button>
+        </div>
+        
+      </nav>
+      <a href="https://wa.me/541173633880" target="_blank" class="px-4 py-2 rounded-xl bg-green-500 text-white font-bold soft-pulse">WhatsApp</a>
+    </div>
+     
+      
+  </header>
+
+<main>
+  
+
+  <section id="catalogo" class="catalogo-seccion">
+    <h2 id="catalogoTitulo">Catalogo</h2>
+    <div id="categoriasMain" class="categorias"></div>
+    <div id="subcategorias" class="subcategorias"></div>
+    <div class="grid" id="grid-catalogo"></div>
+    <div id="categoriasBottom" class="categorias categorias-bottom"></div>
+  </section>
+
+
+  <!--  
+<section id="galeria" class="galeria-wrap">
+    <h2>Trabajos realizados</h2>
+    <p>Pedidos reales hechos con amor</p>
+    <div class="galeria">
+      <img src="images/galeria/1.jpg" alt="Trabajo realizado 1">
+      <img src="images/galeria/2.jpg" alt="Trabajo realizado 2">
+      <img src="images/galeria/3.jpg" alt="Trabajo realizado 3">
+      <img src="images/galeria/4.jpg" alt="Trabajo realizado 4">
+    </div>
+    <a href="#catalogo" class="back-to-catalogo" aria-label="Volver al inicio del catalogo">↑ Volver al catalogo</a>
+  </section>-->
+</main>
+
+<div id="overlay" class="cart-overlay" onclick="cerrarCarrito()"></div>
+
+<aside id="cart" class="cart">
+  <button class="cart-btn" onclick="toggleCart()">
+    X <span id="cartCount">0</span>
+  </button>
+
+  <h2>Tu carrito</h2>
+  <div id="cartItems"></div>
+  <p>Total: $<span id="cartTotal">0</span></p>
+
+  <form id="checkoutForm" class="checkout-form">
+    <label for="clienteNombre">Nombre</label>
+    <input id="clienteNombre" name="clienteNombre" type="text" placeholder="Tu nombre" required>
+
+    <label for="clienteWhatsapp">WhatsApp</label>
+    <input id="clienteWhatsapp" name="clienteWhatsapp" type="tel" placeholder="11 1234 5678" required>
+
+    <button type="button" id="clearCartBtn" class="btn-clear">Vaciar carrito</button>
+    <button type="button" id="downloadPdfBtn" class="btn-pdf">Descargar pedido en PDF</button>
+    <button type="submit" class="btn-whatsapp">Enviar pedido por WhatsApp</button>
+  </form>
+</aside>
+
+
+<script src="js/data.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/catalogo.js"></script>
+<script src="js/carrito.js"></script>
+<script src="js/main.js"></script>
+<script src="js/script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer"></script>
+<footer class="footer">
+  <div class="footer-grid">
+
+    <div>
+      <h3>LlenaloDStickers</h3>
+      <p>
+        Stickers personalizados resistentes al agua.<br>
+        Anime, fútbol, series y más.
+      </p>
+    </div>
+
+    <div>
+      <h3>Contacto</h3>
+      <p>WhatsApp: 11 7363-3880</p>
+      <a href="https://wa.me/541173633880" target="_blank">
+        Hacer pedido
+      </a>
+    </div>
+
+    <div>
+      <h3>Seguinos</h3>
+      <a href="https://instagram.com/llenalodstickers" target="_blank">
+        Instagram
+      </a>
+    </div>
+
+  </div>
+
+  <div class="footer-copy">
+    Año 2026 LlenaloDstickers· Hecho a mano en Argentina Arg
+  </div>
+</footer>
+
+
+</body>
+</html>
