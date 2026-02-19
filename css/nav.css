@@ -2,14 +2,16 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: var(--negro);
+  background: linear-gradient(180deg, #121212 0%, #0c0c0c 100%);
   color: var(--blanco);
   padding: 12px 18px 10px;
+  border-bottom: 1px solid #1f1f1f;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
 }
 
 .nav-top {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 10px;
 }
@@ -17,26 +19,60 @@
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-cta {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .nav-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #2f2f2f;
-  background: #1d1d1d;
-  color: #fff;
+  position: relative;
+  border: 1px solid #2a2a2a;
+  background: #181818;
+  color: #f7f7f7;
   border-radius: 999px;
   padding: 9px 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease, background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+}
+
+.nav-pill::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 6px;
+  height: 2px;
+  background: var(--amarillo);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.2s ease;
 }
 
 .nav-pill:hover {
-  background: #2a2a2a;
-  transform: translateY(-1px);
+  background: #222;
+  transform: translateY(-2px);
+  border-color: #3a3a3a;
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.45);
+}
+
+.nav-pill:hover::after {
+  transform: scaleX(1);
+}
+
+.nav-pill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 200, 0, 0.35), 0 12px 22px rgba(0, 0, 0, 0.45);
 }
 
 .categorias-nav-panel {
@@ -63,22 +99,22 @@
 }
 
 #openCart {
-  background: linear-gradient(135deg, #ffc800, #ffdf5a);
-  color: #161616;
-  border: 1px solid #f3c100;
+  background: linear-gradient(135deg, #ffc800 0%, #ffe27a 100%);
+  color: #111;
+  border: 1px solid #e2b100;
   padding: 9px 14px;
   border-radius: 999px;
   font-weight: 800;
   font-size: 16px;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 #openCart:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 16px 26px rgba(0, 0, 0, 0.35);
   filter: saturate(1.08);
 }
 
@@ -93,4 +129,83 @@
   border-radius: 999px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.nav-whatsapp {
+  background: linear-gradient(135deg, #25d366 0%, #1ea855 100%);
+  border: 1px solid #1c8f49;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
+}
+
+.nav-whatsapp:hover {
+  background: linear-gradient(135deg, #2be070 0%, #1fb257 100%);
+  border-color: #1f9b4d;
+}
+
+.whatsapp-float {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1200;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 800;
+  border: 1px solid #1c8f49;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.whatsapp-float:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.4);
+  filter: saturate(1.08);
+}
+
+.whatsapp-float:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 200, 0, 0.35), 0 18px 32px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 720px) {
+  .whatsapp-float {
+    right: 14px;
+    bottom: 14px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 720px) {
+  .nav-top {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-pill,
+  #openCart {
+    transition: none;
+  }
+
+  .nav-pill:hover,
+  #openCart:hover {
+    transform: none;
+  }
+
+  .nav-pill::after {
+    transition: none;
+  }
 }
