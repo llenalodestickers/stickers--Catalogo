@@ -33,7 +33,10 @@ if (-not (Test-Path $imagesRoot)) {
   throw "No existe la carpeta: $imagesRoot"
 }
 
-$files = Get-ChildItem -Path $imagesRoot -Recurse -File -Filter *.png | Sort-Object FullName
+$validExts = @(".png", ".jpg", ".jpeg", ".webp", ".gif")
+$files = Get-ChildItem -Path $imagesRoot -Recurse -File |
+  Where-Object { $validExts -contains $_.Extension.ToLowerInvariant() } |
+  Sort-Object FullName
 
 $countsByMain = @{}
 $items = New-Object System.Collections.Generic.List[object]
